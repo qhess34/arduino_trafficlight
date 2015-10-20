@@ -9,7 +9,7 @@ int green = 5;
 - 2 is green
 - 99 is all down
 */
-int current_light = 99; // red is the default light
+int current_light = 99; // all is down by default
 
 /* time variables in ms, don't touch it */
 int time = 0;
@@ -23,28 +23,25 @@ int lastchange = 0;
 4 is manual (green or red)
 5 is full_manual (green, orange, red)
 */
-int mod = 99;
-int newmod = 0; // default mod
-int delay_default = 1000;
-int delay_orange = 5000;
-int delay_blink = 600;
-bool status = 0;
+int mod = 99; // no current mod at this point
+int newmod = 0; // default mod loaded during setup function
+int delay_default = 1000; // delay for green and red
+int delay_orange = 5000; // delay for orange
+int delay_blink = 600; // delay for blinking 
+bool status = 0; // just for blinking
 int current_delay = delay_default;
 
 /* Here we are ! */
 void setup() {
-	Serial.begin(9600);
-	pinMode(red, OUTPUT);
-	pinMode(orange, OUTPUT);
-	pinMode(green, OUTPUT);
-        /*digitalWrite(green, HIGH);
-        digitalWrite(orange, HIGH);
-        digitalWrite(red, LOW);*/
-	switchmod(newmod);
+	Serial.begin(9600); // open serial connection
+	pinMode(red, OUTPUT); // set pin on output
+	pinMode(orange, OUTPUT); // set pin on output
+	pinMode(green, OUTPUT); // set pin on output
+	switchmod(newmod); // load the default mod
 }
 
 void loop() {
-
+	// call function off the current mod
 	switch (mod) {
 		case 0:
 			normal();
@@ -68,6 +65,7 @@ void loop() {
 	}
 }
 
+/* function for initializing each mod */
 void switchmod(int newmod) {
 	if(newmod != mod) {
 		switch(newmod) {
@@ -97,6 +95,7 @@ void switchmod(int newmod) {
 	}
 }
 
+/* list off mods */
 void normal() {
 	if(millis() > (lastchange + current_delay)) {
 		lastchange = millis();
@@ -125,6 +124,7 @@ void manual() {
 void full_manual() {
 }
 
+/* go to the next light */
 int nextlight() {
 /*	int current_light;
 	int delay;*/
@@ -152,6 +152,8 @@ int nextlight() {
 	}			
 	return delayreturn;
 }
+
+/* blink a light */
 void blinklight(int light) {
 	if(status) {
 		current_light = light;
