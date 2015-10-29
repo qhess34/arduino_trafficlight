@@ -161,6 +161,9 @@ void switchmod(int newmod) {
       break;
     }
   mod = newmod;
+  Serial.print("Switch to mod : ");
+  Serial.print(mod);
+  Serial.print("\n");
   }
 }
 
