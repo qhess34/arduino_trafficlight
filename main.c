@@ -39,12 +39,15 @@ long lastchange = 0;
 */
 int mod = 99; // technical default mod 
 int newmod = 10; // functionnal default mod 
+int updmod;
 long delay_green = 10000; // delay for green 
 long delay_red = 10000; // delay for red
 long delay_orange = 3000; // delay for orange
 int delay_blink = 600; // delay for blinking
 bool status = 0; // just for blinking
 long current_delay = delay_red;
+int ins;
+
 
 /* relays_conf */
 bool down  = HIGH;
@@ -87,7 +90,7 @@ void loop() {
 
   delay(10);
   if (mySerial.available()) { 
-	ins=mySerial.read();
+	ins=(int) mySerial.read();
 	delay(10);
   }
   Serial.print("Receive : ");
@@ -95,7 +98,7 @@ void loop() {
   Serial.print(" EOC");
   Serial.print("\n");
 
-  updmod=ins;
+  int updmod = ins;
 
   switchmod(updmod); 
   switch (mod) {
@@ -109,10 +112,10 @@ void loop() {
       trains_stop();
       break;
     case 50:
-      manual(0);
+      manual();
       break;
     case 52:
-      manual(2);
+      manual();
       break;
     case 60:
       full_manual(0);
@@ -275,3 +278,4 @@ void blinklight(int light) {
           }
        }
 }
+
