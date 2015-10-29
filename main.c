@@ -39,12 +39,12 @@ long lastchange = 0;
 */
 int mod = 99; // technical default mod 
 int newmod = 10; // functionnal default mod 
-int updmod;
+//int updmod;
 long delay_green = 10000; // delay for green 
 long delay_red = 10000; // delay for red
 long delay_orange = 3000; // delay for orange
 int delay_blink = 600; // delay for blinking
-bool status = 0; // just for blinking
+bool binblink = 0; // just for blinking
 long current_delay = delay_red;
 int ins;
 
@@ -69,7 +69,7 @@ void setup() {
   pinMode(orange, OUTPUT); // set pin on output
   pinMode(green, OUTPUT); // set pin on output
 
-  // Initialize relays status
+  // Initialize relays binblink
   digitalWrite(green, down);
   digitalWrite(orange, down);
   digitalWrite(red, down);
@@ -80,27 +80,34 @@ void setup() {
 
 void loop() {
   // call function off the current mod
-  /*Serial.print(digitalRead(red));
+  Serial.print(current_light);
+  Serial.print(",");
+  Serial.print(digitalRead(red));
   Serial.print(",");
   Serial.print(digitalRead(orange));
   Serial.print(",");
   Serial.print(digitalRead(green));
-  Serial.println(" ");*/
- /* delay(1000);*/
+  Serial.print("\n");
+ delay(100);
 
   delay(10);
   if (mySerial.available()) { 
-	ins=(int) mySerial.read();
-	delay(10);
-  }
+  ins=(int) mySerial.read();
   Serial.print("Receive : ");
   Serial.print(ins);
   Serial.print(" EOC");
   Serial.print("\n");
+  delay(10);
 
-  int updmod = ins;
+  if(ins != 255) {
+    newmod=ins;
+  }
+  }
 
-  switchmod(updmod); 
+
+  //int updmod = ins;
+
+  switchmod(newmod); 
   switch (mod) {
     case 10:
       normal();
@@ -112,10 +119,10 @@ void loop() {
       trains_stop();
       break;
     case 50:
-      manual();
+      manual(0);
       break;
     case 52:
-      manual();
+      manual(2);
       break;
     case 60:
       full_manual(0);
@@ -126,7 +133,6 @@ void loop() {
     case 62:
       full_manual(2);
       break;
-
     default:
       outage();
       break;
@@ -137,6 +143,11 @@ void loop() {
 /* function for initializing each mod */
 void switchmod(int newmod) {
   if(newmod != mod) {
+      mod = newmod;
+      Serial.print("Switch to mod : ");
+      Serial.print(mod);
+      Serial.print("\n");
+  
     switch(newmod) {
       case 10:
         digitalWrite(green, down);
@@ -161,12 +172,13 @@ void switchmod(int newmod) {
           digitalWrite(green, down);
           break;
         }
+        case 50:
+        case 52:
+          current_delay = 0;
+          break;
       break;
     }
-  mod = newmod;
-  Serial.print("Switch to mod : ");
-  Serial.print(mod);
-  Serial.print("\n");
+
   }
 }
 
@@ -193,16 +205,21 @@ void outage() {
   blinklight(1);
 }
 
-void manual() {
-	nextlight();
+void manual(int manual_light) {
+  if(current_light != manual_light) {
+    if(millis() > (lastchange + current_delay)) {
+      lastchange = millis();
+      current_delay = nextlight();
+    }
+}
 }
 
 void full_manual(int fmanual_light) {
-	switch(fmanual_light) {
-		case 0:
-			digitalWrite(red, up);
-			current_light=0;
-			break;
+  switch(fmanual_light) {
+               case 0:
+                        digitalWrite(red, up);
+                        current_light=0;
+                        break;
                 case 1:
                         digitalWrite(orange, up);
                         current_light=1;
@@ -211,7 +228,7 @@ void full_manual(int fmanual_light) {
                         digitalWrite(green, up);
                         current_light=2;
                         break;
-	}			
+  }     
 }
 
 /* go to the next light */
@@ -245,37 +262,33 @@ int nextlight() {
 
 /* blink a light */
 void blinklight(int light) {
-  if(status) {
+
+  if(binblink) {
     current_light = light;
   }
   else {
     current_light = 99;
   }
- 
-/*  Serial.print(status);
-  Serial.print(",");
-  Serial.print(millis());
-  Serial.print(",");
-  Serial.print(lastchange);
-  Serial.print(",");
-  Serial.print(light);
-  Serial.println(" ");
-  Serial.println("======="); */
- 
+
+  Serial.print("cur=");
+  Serial.print(current_light);
+  Serial.print("\n");
+  
         if(millis() > (lastchange + delay_blink)) {
     lastchange = millis();
-    status = !status;
+    binblink = !binblink;
           switch (light) {
                 case 0:
-                        digitalWrite(red, status);
+                        digitalWrite(red, binblink);
                         break;
                 case 1:
-                        digitalWrite(orange, status);
+                        digitalWrite(orange, binblink);
                         break;
                 case 2:
-                        digitalWrite(green, status);
+                        digitalWrite(green, binblink);
                         break;
           }
        }
 }
+
 
