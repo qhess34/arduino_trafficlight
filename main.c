@@ -1,9 +1,10 @@
+/* CAUTION : QUICK & DIRTY ! (new version will be make next time) */
 /* This Arduino program allow to control a traffic light (or three light) thanks to a bluetooth app on your mobile */
 /* It contains many possibilities (mods) to enjoy your traffic light */
 /* I used it with a 4 chanels relay and an Arduino Uno + A Nexus 4 */
 /* Author : Quentin HESS */
 /* Date of creation : 2015.10.20 */
-/* Comments : Still in progress (I'm waiting the bluetooth module for Arduino) */
+/* Comments : Still in progress */ 
 
 #include <SoftwareSerial.h>
 
@@ -29,17 +30,17 @@ int current_light = 99; // all is down by default
 long lastchange = 0;
 
 /* mod variables
-0 is normal (red, green then orange and etc)
-1 is outage (orange blinking)
-2 is go_carefully (green blinking)
-3 is trains_stop (red blinking)
-4 is manual (green or red)
-5 is full_manual (green, orange, red)
+10 is normal (red, green then orange and etc)
+20 is outage (orange blinking)
+30 is go_carefully (green blinking)
+40 is trains_stop (red blinking)
+5X is manual (green (52) or red (50))
+6X is full_manual (green (62), orange (61), red (60))
 */
 int mod = 99; // technical default mod 
-int newmod = 2; // functionnal default mod 
-long delay_green = 10000; // delay for green and red
-long delay_red = 10000;
+int newmod = 10; // functionnal default mod 
+long delay_green = 10000; // delay for green 
+long delay_red = 10000; // delay for red
 long delay_orange = 3000; // delay for orange
 int delay_blink = 600; // delay for blinking
 bool status = 0; // just for blinking
@@ -94,23 +95,35 @@ void loop() {
   Serial.print(" EOC");
   Serial.print("\n");
 
+  updmod=ins;
+
   switchmod(updmod); 
   switch (mod) {
-    case 0:
+    case 10:
       normal();
       break;
-    case 2:
+    case 30:
       go_carefully();
       break;
-    case 3:
+    case 40:
       trains_stop();
       break;
-    case 4:
-      manual();
+    case 50:
+      manual(0);
       break;
-    case 5:
-      full_manual();
+    case 52:
+      manual(2);
       break;
+    case 60:
+      full_manual(0);
+      break;
+    case 61:
+      full_manual(1);
+      break;
+    case 62:
+      full_manual(2);
+      break;
+
     default:
       outage();
       break;
@@ -122,15 +135,18 @@ void loop() {
 void switchmod(int newmod) {
   if(newmod != mod) {
     switch(newmod) {
-      case 0:
+      case 10:
         digitalWrite(green, down);
         digitalWrite(orange, down);
         digitalWrite(red, up);
         current_light = 0;
         break;
-      case 1:
-      case 2:
-      case 3:
+      case 20:
+      case 30:
+      case 40:
+      case 60:
+      case 61:
+      case 62:
         switch (current_light) {
         case 0:
           digitalWrite(red, down);
@@ -172,11 +188,24 @@ void outage() {
 }
 
 void manual() {
-/* WIP */
+	nextlight();
 }
 
-void full_manual() {
-/* WIP */
+void full_manual(int fmanual_light) {
+	switch(fmanual_light) {
+		case 0:
+			digitalWrite(red, up);
+			current_light=0;
+			break;
+                case 1:
+                        digitalWrite(orange, up);
+                        current_light=1;
+                        break;
+                case 2:
+                        digitalWrite(green, up);
+                        current_light=2;
+                        break;
+	}			
 }
 
 /* go to the next light */
