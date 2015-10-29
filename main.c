@@ -5,12 +5,19 @@
 /* Date of creation : 2015.10.20 */
 /* Comments : Still in progress (I'm waiting the bluetooth module for Arduino) */
 
+#include <SoftwareSerial.h>
+
 // define pin heads
 int red = 10;
 int orange = 9;
 int green = 8;
+int btrx = 6;
+int bttx = 7;
 
-/* 
+// Create custom serial pin instance
+SoftwareSerial mySerial(bttx, btrx); // RX, TX
+
+/*
 - 0 is red
 - 1 is orange
 - 2 is green
@@ -21,7 +28,7 @@ int current_light = 99; // all is down by default
 /* time variables in ms, don't touch it */
 long lastchange = 0;
 
-/* mod variables 
+/* mod variables
 0 is normal (red, green then orange and etc)
 1 is outage (orange blinking)
 2 is go_carefully (green blinking)
@@ -29,13 +36,14 @@ long lastchange = 0;
 4 is manual (green or red)
 5 is full_manual (green, orange, red)
 */
-int mod = 99; // no current mod at this point
-int newmod = 1; // default mod loaded during setup function
-long delay_default = 10000; // delay for green and red
+int mod = 99; // technical default mod 
+int newmod = 2; // functionnal default mod 
+long delay_green = 10000; // delay for green and red
+long delay_red = 10000;
 long delay_orange = 3000; // delay for orange
-int delay_blink = 600; // delay for blinking 
+int delay_blink = 600; // delay for blinking
 bool status = 0; // just for blinking
-long current_delay = delay_default;
+long current_delay = delay_red;
 
 /* relays_conf */
 bool down  = HIGH;
@@ -43,26 +51,50 @@ bool up = LOW;
 
 /* Here we are ! */
 void setup() {
+
+  // Initialize Serial Connection for debug
   Serial.begin(9600); // open serial connection
+  Serial.println("Start of TL Arduino");
+
+  // Initialize BT Connection for instructions
+  mySerial.begin(9600);
+  mySerial.println("Open BT connection");
+
+  // Initialize relay pins
   pinMode(red, OUTPUT); // set pin on output
   pinMode(orange, OUTPUT); // set pin on output
   pinMode(green, OUTPUT); // set pin on output
+
+  // Initialize relays status
   digitalWrite(green, down);
   digitalWrite(orange, down);
   digitalWrite(red, down);
-  switchmod(newmod); // load the default mod
+
+  // Load the default mod
+  switchmod(newmod); 
 }
 
 void loop() {
   // call function off the current mod
-  Serial.print(digitalRead(red));
+  /*Serial.print(digitalRead(red));
   Serial.print(",");
   Serial.print(digitalRead(orange));
   Serial.print(",");
   Serial.print(digitalRead(green));
-  Serial.println(" ");
-  delay(1000);
-  
+  Serial.println(" ");*/
+ /* delay(1000);*/
+
+  delay(10);
+  if (mySerial.available()) { 
+	ins=mySerial.read();
+	delay(10);
+  }
+  Serial.print("Receive : ");
+  Serial.print(ins);
+  Serial.print(" EOC");
+  Serial.print("\n");
+
+  switchmod(updmod); 
   switch (mod) {
     case 0:
       normal();
@@ -82,7 +114,7 @@ void loop() {
     default:
       outage();
       break;
-    
+   
   }
 }
 
@@ -137,7 +169,7 @@ void trains_stop() {
 
 void outage() {
   blinklight(1);
-} 
+}
 
 void manual() {
 /* WIP */
@@ -157,22 +189,22 @@ int nextlight() {
     case 0:
       digitalWrite(red, down);
       digitalWrite(green, up);
-      delayreturn = delay_default;
+      delayreturn = delay_green;
       current_light = 2;
       break;
     case 1:
       digitalWrite(orange, down);
       digitalWrite(red, up);
-      delayreturn = delay_default;
+      delayreturn = delay_red;
       current_light = 0;
       break;
     case 2:
-      digitalWrite(green, down);      
+      digitalWrite(green, down);     
       digitalWrite(orange, up);
       delayreturn = delay_orange;
       current_light = 1;
       break;
-  }     
+  }    
   return delayreturn;
 }
 
@@ -184,8 +216,8 @@ void blinklight(int light) {
   else {
     current_light = 99;
   }
-  
-  Serial.print(status);
+ 
+/*  Serial.print(status);
   Serial.print(",");
   Serial.print(millis());
   Serial.print(",");
@@ -193,8 +225,8 @@ void blinklight(int light) {
   Serial.print(",");
   Serial.print(light);
   Serial.println(" ");
-  Serial.println("=======");
-  
+  Serial.println("======="); */
+ 
         if(millis() > (lastchange + delay_blink)) {
     lastchange = millis();
     status = !status;
@@ -211,4 +243,3 @@ void blinklight(int light) {
           }
        }
 }
-
