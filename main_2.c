@@ -10,11 +10,11 @@
 
 /* CONFIGURATION */
 // define pin heads
-int red = 10;
-int orange = 9;
-int green = 8;
-int btrx = 6;
-int bttx = 7;
+const int red = 10;
+const int orange = 9;
+const int green = 8;
+const int btrx = 6;
+const int bttx = 7;
 
 /* mode variables
 10 is normal (red, green then orange and etc)
@@ -34,8 +34,8 @@ long delay_orange = 3000; // delay for orange
 int delay_blink = 600; // delay for blinking
 
 /* relays_conf */
-bool down  = HIGH;
-bool up = LOW;
+const bool down  = HIGH;
+const bool up = LOW;
 
 /* END CONFIGURATION */
 
@@ -45,9 +45,6 @@ int mod = 99; // technical default mod
 bool binblink = 0; // just for blinking
 long current_delay = delay_red;
 int ins;
-
-char inData[80];
-byte index = 0;
 
 // Create custom serial pin instance
 SoftwareSerial mySerial(bttx, btrx); // RX, TX
@@ -95,8 +92,8 @@ void loop() {
 	  Serial.print(" EOC");
 	  Serial.print("\n");
 
-	  if(ins == 10 || ins == 20 || ins == 30 || ins == 40 || ins == 50 || ins == 52 || ins = 60 || ins == 61 || ins == 62) {
-	    newmod=ins;
+	  if(ins == 10 || ins == 20 || ins == 30 || ins == 40 || ins == 50 || ins == 52 || ins == 60 || ins == 61 || ins == 62) {
+	    newmod = ins;
 	  }
 	  else if(ins == 70 && delay_green >= 2000) {
 		delay_green -= 1000;
@@ -120,7 +117,7 @@ void loop() {
                 delay_blink -= 200;
           }
           else if(ins == 77 && delay_blink < 10000) {
-                delay_green += 200;
+                delay_blink += 200;
           }
 
 	
