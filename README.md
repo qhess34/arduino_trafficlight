@@ -18,7 +18,7 @@ INSTALL
 * Download the app trafficlight.apk
 
 WARNING
-=====
+======
 I am not reponsible in case of troubles with your installation, verify everything before power it. Don't touch the components when they're on power.
 Enjoy !
 
