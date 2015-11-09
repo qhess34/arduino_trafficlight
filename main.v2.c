@@ -4,7 +4,7 @@
 /* I used it with a 4 chanels relay and an Arduino Uno + A Nexus 4 */
 /* Author : Quentin HESS */
 /* Date of creation : 2015.10.20 */
-/* Comments : Still in progress */ 
+/* Comments : Should be ehanced */ 
 
 #include <SoftwareSerial.h>
 
