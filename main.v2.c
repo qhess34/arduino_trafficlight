@@ -1,4 +1,4 @@
-/* CAUTION : QUICK & DIRTY ! (new version will be make next time) */
+/* CAUTION : QUICK & DIRTY ! */
 /* This Arduino program allow to control a traffic light (or three light) thanks to a bluetooth app on your mobile */
 /* It contains many possibilities (mods) to enjoy your traffic light */
 /* I used it with a 4 chanels relay and an Arduino Uno + A Nexus 4 */
