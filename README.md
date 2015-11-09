@@ -8,6 +8,7 @@ REQUIREMENT
 * A 3 channels relay board at least
 * A bluetooth shield (HC-05 is perfect)
 * Some wires to connect everything together
+* An Android phone
 
 INSTALL
 ======
