@@ -19,7 +19,7 @@ INSTALL
 
 WARNING
 ======
-I am not reponsible in case of troubles with your installation, verify everything before power it. Don't touch the components when they're on power.
+I am not reponsible in case of troubles with your installation, check everything before powering it. Don't touch the components when they're on power.
 Enjoy !
 
 
