@@ -17,12 +17,21 @@ const int btrx = 6;
 const int bttx = 7;
 
 /* mode variables
-10 is normal (red, green then orange and etc)
-20 is outage (orange blinking)
-30 is go_carefully (green blinking)
-40 is trains_stop (red blinking)
+10 is normal (red, green then orange and etc) 100 -> 010 -> 001
+20 is outage (orange blinking) 010 -> 000
+30 is go_carefully (green blinking) 100 -> 000
+40 is trains_stop (red blinking) 001 -> 000
 5X is manual (green (52) or red (50))
+- 50 : XXX -> 001
+- 52 : XXX -> 100
 6X is full_manual (green (62), orange (61), red (60))
+- 60 : 001
+- 61 : 010
+- 62 : 100
+- 63 : 011
+- 64 : 101
+- 65 : 110
+- 66 : 111
 7X delays (reduce/rise green: 70/71, orange: 72/73, red: 74/75, blink: 76/77))
 */
 int newmod = 10; // functionnal default mod 
@@ -92,7 +101,7 @@ void loop() {
 	  Serial.print(" EOC");
 	  Serial.print("\n");
 
-	  if(ins == 10 || ins == 20 || ins == 30 || ins == 40 || ins == 50 || ins == 52 || ins == 60 || ins == 61 || ins == 62) {
+	  if(ins == 10 || ins == 20 || ins == 30 || ins == 40 || ins == 50 || ins == 52 || ins == 60 || ins == 61 || ins == 62 || ins == 63 || ins == 64 || ins == 65 || ins == 66) {
 	    newmod = ins;
 	  }
 	  else if(ins == 70 && delay_green >= 2000) {
@@ -122,7 +131,6 @@ void loop() {
 
 	
   }
-
   switchmod(newmod); 
   switch (mod) {
     case 10:
@@ -148,6 +156,23 @@ void loop() {
       break;
     case 62:
       full_manual(green);
+      break;
+    case 63:
+      switchon(orange);
+      switchon(red);
+      break;
+    case 63:
+      switchon(green);
+      switchon(red);
+      break;
+    case 63:
+      switchon(green);
+      switchon(orange);
+      break;
+    case 63:
+      switchon(green);
+      switchon(orange);
+      switchon(red);
       break;
     default:
       outage();
@@ -175,6 +200,10 @@ void switchmod(int newmod) {
       case 60:
       case 61:
       case 62:
+      case 63:
+      case 64:
+      case 65:
+      case 66:
 	shutdownall();
         break;
       case 50:
